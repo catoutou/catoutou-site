@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Clique sur la bonne couleur - Catoutou-Site</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      text-align: center;
+      padding: 20px;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    /* ÉCRAN 1 - MENU PRINCIPAL */
+    .screen {
+      display: none;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #menu-screen h1 {
+      font-size: 3em;
+      margin-bottom: 0.2em;
+      background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    #menu-screen h2 {
+      font-weight: 400;
+      color: #e0e0e0;
+      margin-top: 0;
+      margin-bottom: 40px;
+    }
+
+    .main-button {
+      padding: 20px 40px;
+      font-size: 1.4em;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 50px;
+      color: white;
+      cursor: pointer;
+      margin: 20px 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .main-button:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+    }
+
+    /* ÉCRAN 2 - CHOIX DU MODE */
+    #mode-screen h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .mode-explanation {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+      color: #f0f0f0;
+      line-height: 1.6;
+    }
+
+    .time-selector {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 20px;
+      margin: 30px 0;
+    }
+
+    .time-selector h3 {
+      margin-top: 0;
+      color: #fff;
+      font-size: 1.3em;
+    }
+
+    .time-inputs {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    .time-input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .time-input-group label {
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #e0e0e0;
+    }
+
+    .time-input-group input {
+      padding: 10px 15px;
+      font-size: 1.1em;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      text-align: center;
+      width: 80px;
+    }
+
+    .time-input-group input:focus {
+      outline: none;
+      border-color: #4ecdc4;
+      box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+    }
+
+    /* ÉCRAN 3 - JEU ACTIF */
+    .timer-display {
+      font-size: 2em;
+      font-weight: bold;
+      color: #4ecdc4;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .timer-display.warning {
+      color: #ff6b6b;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    #game-screen h1 {
+      font-size: 2.2em;
+      margin-bottom: 10px;
+    }
+
+    #instruction {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      color: #e0e0e0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 100px);
+      grid-gap: 15px;
+      justify-content: center;
+      margin: 30px 0;
+    }
+
+    .color-box {
+      width: 100px;
+      height: 100px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .color-box:hover {
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 8px 25px rgba(255,255,255,0.2);
+    }
+
+    .color-box:active {
+      transform: scale(0.95);
+    }
+
+    .score-display {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #4ecdc4;
+      margin: 20px 0;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    /* ÉCRAN 4 - FIN DE PARTIE */
+    #end-screen h1 {
+      font-size: 2.8em;
+      color: #ff6b6b;
+      margin-bottom: 20px;
+    }
+
+    .final-score {
+      font-size: 3em;
+      font-weight: bold;
+      color: #4ecdc4;
+      margin: 30px 0;
+      text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .end-message {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 25px;
+      border-radius: 20px;
+      margin: 20px 0;
+      font-size: 1.2em;
+      line-height: 1.5;
+    }
+
+    /* NAVIGATION */
+    .navigation {
+      margin-top: 40px;
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      display: block;
+      color: white;
+      background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+      text-decoration: none;
+      padding: 12px 25px;
+      border-radius: 25px;
+      text-align: center;
+      min-width: 120px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .nav-links a:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(3, 80px);
+      }
+      
+      .color-box {
+        width: 80px;
+        height: 80px;
+      }
+      
+      .time-inputs {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .nav-links {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- ÉCRAN 1 - MENU PRINCIPAL -->
+    <div id="menu-screen" class="screen active">
+      <h1>Catoutou-Site</h1>
+      <h2>Clique sur la bonne couleur</h2>
+      <button class="main-button" onclick="showModeScreen()">START</button>
+      <nav class="navigation">
+        <ul class="nav-links">
+          <li><a href="../../../index.html">Accueil</a></li>
+          <li><a href="../index.html">Tous les jeux</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- ÉCRAN 2 - CHOIX DU MODE -->
+    <div id="mode-screen" class="screen">
+      <h1>Paramètres du jeu</h1>
+      <div class="mode-explanation">
+        <p><strong>Comment jouer :</strong></p>
+        <p>Cliquez sur la couleur demandée le plus rapidement possible ! Chaque bonne réponse vous fait gagner un point, chaque erreur vous en fait perdre un. Soyez rapide et précis !</p>
+      </div>
+      
+      <div class="time-selector">
+        <h3>Choisissez la durée de la partie</h3>
+        <div class="time-inputs">
+          <div class="time-input-group">
+            <label for="minutes">Minutes</label>
+            <input type="number" id="minutes" min="0" max="10" value="1">
+          </div>
+          <div class="time-input-group">
+            <label for="seconds">Secondes</label>
+            <input type="number" id="seconds" min="0" max="59" value="30">
+          </div>
+        </div>
+        <button class="main-button" onclick="startGame()">START</button>
+      </div>
+      
+      <nav class="navigation">
+        <ul class="nav-links">
+          <li><a href="../../../index.html">Accueil</a></li>
+          <li><a href="../index.html">Tous les jeux</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- ÉCRAN 3 - JEU ACTIF -->
+    <div id="game-screen" class="screen">
+      <div class="timer-display" id="timer">02:00</div>
+      <h1>Clique sur la bonne couleur</h1>
+      <h2 id="instruction">Clique sur la couleur : <strong>bleu</strong></h2>
+      <div id="grid" class="grid"></div>
+      <div class="score-display">Score : <span id="score">0</span></div>
+      <nav class="navigation">
+        <ul class="nav-links">
+          <li><a href="../../../index.html">Accueil</a></li>
+          <li><a href="../index.html">Tous les jeux</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- ÉCRAN 4 - FIN DE PARTIE -->
+    <div id="end-screen" class="screen">
+      <h1>Le temps est terminé !</h1>
+      <div class="end-message">
+        <p>Bravo ! Vous avez terminé la partie.</p>
+      </div>
+      <div class="final-score">Score final : <span id="final-score">0</span></div>
+      <nav class="navigation">
+        <ul class="nav-links">
+          <li><a href="../../../index.html">Accueil</a></li>
+          <li><a href="../index.html">Tous les jeux</a></li>
+          <li><a href="#" onclick="showMenuScreen()">Rejouer</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <script>
+    const colors = {
+      bleu: ['#0d47a1', '#42a5f5'],
+      rouge: ['#b71c1c', '#ef5350'],
+      vert: ['#1b5e20', '#66bb6a'],
+      jaune: ['#fbc02d', '#fff176'],
+      violet: ['#6a1b9a', '#ba68c8'],
+      orange: ['#e65100', '#ffb74d'],
+      rose: ['#ad1457', '#f06292'],
+      cyan: ['#006064', '#4dd0e1'],
+      gris: ['#424242', '#bdbdbd'],
+      marron: ['#4e342e', '#a1887f']
+    };
+
+    let score = 0;
+    let targetColor = '';
+    let gameTimer = null;
+    let timeRemaining = 0;
+
+    const instruction = document.getElementById('instruction');
+    const grid = document.getElementById('grid');
+    const scoreDisplay = document.getElementById('score');
+    const timerDisplay = document.getElementById('timer');
+    const finalScoreDisplay = document.getElementById('final-score');
+
+    // Navigation entre écrans
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function showMenuScreen() {
+      showScreen('menu-screen');
+      resetGame();
+    }
+
+    function showModeScreen() {
+      showScreen('mode-screen');
+    }
+
+    function startGame() {
+      const minutes = parseInt(document.getElementById('minutes').value) || 0;
+      const seconds = parseInt(document.getElementById('seconds').value) || 0;
+      
+      if (minutes === 0 && seconds === 0) {
+        alert('Veuillez choisir une durée de jeu valide !');
+        return;
+      }
+      
+      timeRemaining = (minutes * 60) + seconds;
+      score = 0;
+      scoreDisplay.textContent = score;
+      
+      showScreen('game-screen');
+      setupGame();
+      startTimer();
+    }
+
+    function startTimer() {
+      updateTimerDisplay();
+      gameTimer = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        
+        if (timeRemaining <= 10) {
+          timerDisplay.classList.add('warning');
+        }
+        
+        if (timeRemaining <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeRemaining / 60);
+      const seconds = timeRemaining % 60;
+      timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function endGame() {
+      clearInterval(gameTimer);
+      finalScoreDisplay.textContent = score;
+      showScreen('end-screen');
+    }
+
+    function resetGame() {
+      clearInterval(gameTimer);
+      score = 0;
+      timeRemaining = 0;
+      timerDisplay.classList.remove('warning');
+    }
+
+    function randomColorName() {
+      const keys = Object.keys(colors);
+      return keys[Math.floor(Math.random() * keys.length)];
+    }
+
+    function createBox(colorName) {
+      const [start, end] = colors[colorName];
+      const box = document.createElement('div');
+      box.classList.add('color-box');
+      box.style.background = `linear-gradient(135deg, ${start}, ${end})`;
+      box.dataset.color = colorName;
+      return box;
+    }
+
+    function setupGame() {
+      grid.innerHTML = '';
+      const allColors = Object.keys(colors);
+      const chosenColors = [];
+
+      while (chosenColors.length < 10) {
+        const color = randomColorName();
+        if (!chosenColors.includes(color)) {
+          chosenColors.push(color);
+        }
+      }
+
+      targetColor = chosenColors[Math.floor(Math.random() * chosenColors.length)];
+      instruction.innerHTML = `Clique sur la couleur : <strong>${targetColor}</strong>`;
+
+      chosenColors.forEach(color => {
+        const box = createBox(color);
+        box.addEventListener('click', () => handleClick(color));
+        grid.appendChild(box);
+      });
+    }
+
+    function handleClick(color) {
+      if (color === targetColor) {
+        score++;
+        scoreDisplay.textContent = score;
+      } else {
+        score = Math.max(0, score - 1);
+        scoreDisplay.textContent = score;
+      }
+      setupGame();
+    }
+  </script>
+</body>
+</html>
