@@ -6,6 +6,49 @@ body {
     background: #f0f0f0;
 }
 
+/* Navigation avec dégradé bleu-rouge */
+.navigation {
+    position: absolute;
+    bottom: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: none;
+    z-index: 999;
+}
+
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    display: block;
+    color: white;
+    background: linear-gradient(135deg, #1E90FF, #FF4500); /* Dégradé bleu à rouge */
+    text-decoration: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    text-align: center;
+    min-width: 150px;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    background: linear-gradient(135deg, #4169E1, #FF6347); /* Dégradé plus vif au survol */
+    transform: scale(1.05);
+}
+
+/* Contenu principal avec marge réduite */
+.main-content {
+    margin-top: 50px; /* Réduit pour la barre plus petite */
+    position: relative;
+}
+
 .screen {
     display: none;
     padding: 2em;
