@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morpions - Jeu contre IA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="../../../index.html">Accueil</a></li>
+            <li><a href="../index.html">Tous les jeux</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>Jeu de Morpions</h1>
+        
+        <div id="game-setup" class="setup-screen">
+            <h2>Choisissez votre symbole</h2>
+            <div class="symbol-choice">
+                <button class="symbol-btn" data-symbol="X">
+                    <span class="symbol">✕</span>
+                    <span>Croix</span>
+                </button>
+                <button class="symbol-btn" data-symbol="O">
+                    <span class="symbol">○</span>
+                    <span>Rond</span>
+                </button>
+            </div>
+            <p class="info">L'IA analysera les probabilités avant chaque coup !</p>
+        </div>
+
+        <div id="game-area" class="game-screen hidden">
+            <div class="game-info">
+                <div class="player-info">
+                    <span>Vous: <span id="player-symbol"></span></span>
+                    <span>IA: <span id="ai-symbol"></span></span>
+                </div>
+                <div id="game-status">À votre tour !</div>
+                <div id="ai-thinking" class="ai-thinking hidden">
+                    <div class="thinking-indicator">
+                        <span>IA réfléchit</span>
+                        <div class="dots">
+                            <span>.</span>
+                            <span>.</span>
+                            <span>.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="game-board" class="board">
+                <div class="cell" data-index="0"></div>
+                <div class="cell" data-index="1"></div>
+                <div class="cell" data-index="2"></div>
+                <div class="cell" data-index="3"></div>
+                <div class="cell" data-index="4"></div>
+                <div class="cell" data-index="5"></div>
+                <div class="cell" data-index="6"></div>
+                <div class="cell" data-index="7"></div>
+                <div class="cell" data-index="8"></div>
+            </div>
+
+            <div class="game-controls">
+                <button id="new-game-btn" class="btn">Nouvelle partie</button>
+                <button id="change-symbol-btn" class="btn">Changer de symbole</button>
+            </div>
+
+            <div class="score">
+                <div class="score-item">
+                    <span>Victoires</span>
+                    <span id="player-wins">0</span>
+                </div>
+                <div class="score-item">
+                    <span>Égalités</span>
+                    <span id="draws">0</span>
+                </div>
+                <div class="score-item">
+                    <span>Défaites</span>
+                    <span id="ai-wins">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
