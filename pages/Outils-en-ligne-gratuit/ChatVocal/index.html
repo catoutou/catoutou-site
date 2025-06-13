@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Vocal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #36393f;
+            color: #dcddde;
+            height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 240px;
+            background-color: #2f3136;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #202225;
+        }
+
+        .server-info {
+            padding: 12px 16px;
+            border-bottom: 1px solid #202225;
+            font-weight: 600;
+            background-color: #202225;
+        }
+
+        .channels {
+            flex: 1;
+            padding: 16px 0;
+        }
+
+        .channel-category {
+            padding: 16px 16px 4px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #8e9297;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .channel {
+            padding: 8px 16px;
+            margin: 1px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.15s ease;
+            position: relative;
+        }
+
+        .channel:hover {
+            background-color: #393c43;
+        }
+
+        .channel.active {
+            background-color: #5865f2;
+        }
+
+        .channel-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .channel-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .user-count {
+            margin-left: auto;
+            font-size: 12px;
+            color: #8e9297;
+            background-color: #202225;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 48px;
+            background-color: #36393f;
+            border-bottom: 1px solid #202225;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-weight: 600;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .welcome-screen {
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .welcome-screen h1 {
+            font-size: 32px;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .welcome-screen p {
+            font-size: 16px;
+            color: #b9bbbe;
+            margin-bottom: 24px;
+        }
+
+        .pseudo-input {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .pseudo-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #202225;
+            border-radius: 4px;
+            background-color: #40444b;
+            color: #dcddde;
+            font-size: 14px;
+        }
+
+        .pseudo-input input::placeholder {
+            color: #72767d;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .btn-primary {
+            background-color: #5865f2;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: #4752c4;
+        }
+
+        .btn-secondary {
+            background-color: #4f545c;
+            color: #ffffff;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5d6269;
+        }
+
+        .btn-danger {
+            background-color: #ed4245;
+            color: #ffffff;
+        }
+
+        .btn-danger:hover {
+            background-color: #c33c3f;
+        }
+
+        .channel-view {
+            display: none;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .channel-view.active {
+            display: block;
+        }
+
+        .channel-view h2 {
+            font-size: 28px;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .channel-info {
+            background-color: #2f3136;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .users-list {
+            margin-bottom: 20px;
+        }
+
+        .users-list h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .user-item {
+            display: inline-block;
+            background-color: #5865f2;
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin: 4px;
+            font-size: 14px;
+        }
+
+        .user-item.current-user {
+            background-color: #57f287;
+            color: #000000;
+        }
+
+        .channel-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .tools-menu {
+            position: absolute;
+            top: 48px;
+            right: 16px;
+            background-color: #2f3136;
+            border: 1px solid #202225;
+            border-radius: 8px;
+            padding: 8px 0;
+            display: none;
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .tools-menu.active {
+            display: block;
+        }
+
+        .tools-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.15s ease;
+        }
+
+        .tools-item:hover {
+            background-color: #393c43;
+        }
+
+        .status-indicator {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #23a559;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .welcome-screen h1 {
+                font-size: 24px;
+            }
+            
+            .pseudo-input {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="server-info">
+            Chat Vocal
+        </div>
+        
+        <div class="channels">
+            <div class="channel-category">Général</div>
+            <div class="channel" data-channel="home">
+                <span class="channel-icon">🏠</span>
+                <span class="channel-name">Accueil</span>
+            </div>
+            <div class="channel" data-channel="tools">
+                <span class="channel-icon">🛠️</span>
+                <span class="channel-name">Outils</span>
+            </div>
+            
+            <div class="channel-category">Salons Vocaux</div>
+            <div class="channel" data-channel="salon-2">
+                <span class="channel-icon">🔊</span>
+                <span class="channel-name">2 Personnes</span>
+                <span class="user-count" data-channel="salon-2">0/2</span>
+            </div>
+            <div class="channel" data-channel="salon-3">
+                <span class="channel-icon">🔊</span>
+                <span class="channel-name">3 Personnes</span>
+                <span class="user-count" data-channel="salon-3">0/3</span>
+            </div>
+            <div class="channel" data-channel="salon-4">
+                <span class="channel-icon">🔊</span>
+                <span class="channel-name">4 Personnes</span>
+                <span class="user-count" data-channel="salon-4">0/4</span>
+            </div>
+            <div class="channel" data-channel="salon-infini">
+                <span class="channel-icon">🔊</span>
+                <span class="channel-name">Infini</span>
+                <span class="user-count" data-channel="salon-infini">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <span id="current-channel">Accueil</span>
+            <div style="margin-left: auto;">
+                <button class="btn btn-secondary" id="tools-btn">Outils</button>
+            </div>
+        </div>
+
+        <div class="tools-menu" id="tools-menu">
+            <div class="tools-item" id="clear-data">Effacer les données</div>
+            <div class="tools-item" id="change-pseudo">Changer de pseudo</div>
+            <div class="tools-item" id="refresh-page">Actualiser</div>
+        </div>
+
+        <div class="content">
+            <div class="welcome-screen" id="welcome-screen">
+                <h1>Bienvenue sur le Chat Vocal !</h1>
+                <p>Choisissez votre pseudo pour commencer à utiliser les salons vocaux.</p>
+                
+                <div class="pseudo-input">
+                    <input type="text" id="pseudo-input" placeholder="Entrez votre pseudo..." maxlength="20">
+                    <button class="btn btn-primary" id="set-pseudo">Valider</button>
+                </div>
+            </div>
+
+            <div class="channel-view" id="channel-view">
+                <h2 id="channel-title">Salon Vocal</h2>
+                
+                <div class="channel-info">
+                    <div class="users-list">
+                        <h3>Utilisateurs connectés :</h3>
+                        <div id="users-container"></div>
+                    </div>
+                    
+                    <div class="channel-actions">
+                        <button class="btn btn-danger" id="leave-channel">Quitter le salon</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ChatApp {
+            constructor() {
+                this.currentUser = null;
+                this.currentChannel = null;
+                this.channels = {
+                    'salon-2': { name: '2 Personnes', maxUsers: 2, users: [] },
+                    'salon-3': { name: '3 Personnes', maxUsers: 3, users: [] },
+                    'salon-4': { name: '4 Personnes', maxUsers: 4, users: [] },
+                    'salon-infini': { name: 'Infini', maxUsers: Infinity, users: [] }
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.loadData();
+                this.setupEventListeners();
+                this.updateChannelCounts();
+                
+                if (this.currentUser) {
+                    this.showWelcomeScreen(false);
+                }
+            }
+
+            loadData() {
+                // Simuler le chargement des données (en réalité, on utiliserait une base de données)
+                const savedUser = localStorage.getItem('chatUser');
+                if (savedUser) {
+                    this.currentUser = savedUser;
+                }
+            }
+
+            saveData() {
+                // Simuler la sauvegarde des données
+                if (this.currentUser) {
+                    localStorage.setItem('chatUser', this.currentUser);
+                }
+            }
+
+            setupEventListeners() {
+                // Validation du pseudo
+                document.getElementById('set-pseudo').addEventListener('click', () => {
+                    this.setPseudo();
+                });
+
+                document.getElementById('pseudo-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.setPseudo();
+                    }
+                });
+
+                // Navigation dans les channels
+                document.querySelectorAll('.channel').forEach(channel => {
+                    channel.addEventListener('click', () => {
+                        const channelId = channel.dataset.channel;
+                        this.selectChannel(channelId);
+                    });
+                });
+
+                // Quitter le salon
+                document.getElementById('leave-channel').addEventListener('click', () => {
+                    this.leaveChannel();
+                });
+
+                // Menu outils
+                document.getElementById('tools-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleToolsMenu();
+                });
+
+                document.addEventListener('click', () => {
+                    this.closeToolsMenu();
+                });
+
+                // Actions du menu outils
+                document.getElementById('clear-data').addEventListener('click', () => {
+                    this.clearData();
+                });
+
+                document.getElementById('change-pseudo').addEventListener('click', () => {
+                    this.changePseudo();
+                });
+
+                document.getElementById('refresh-page').addEventListener('click', () => {
+                    location.reload();
+                });
+            }
+
+            setPseudo() {
+                const input = document.getElementById('pseudo-input');
+                const pseudo = input.value.trim();
+                
+                if (pseudo.length < 2) {
+                    alert('Le pseudo doit contenir au moins 2 caractères');
+                    return;
+                }
+
+                this.currentUser = pseudo;
+                this.saveData();
+                this.showWelcomeScreen(false);
+            }
+
+            showWelcomeScreen(show = true) {
+                const welcomeScreen = document.getElementById('welcome-screen');
+                const channelView = document.getElementById('channel-view');
+                
+                if (show) {
+                    welcomeScreen.style.display = 'block';
+                    channelView.classList.remove('active');
+                } else {
+                    welcomeScreen.style.display = 'none';
+                }
+            }
+
+            selectChannel(channelId) {
+                // Retirer la classe active de tous les channels
+                document.querySelectorAll('.channel').forEach(ch => {
+                    ch.classList.remove('active');
+                });
+
+                // Channels spéciaux - Redirection vers d'autres pages HTML
+                if (channelId === 'home') {
+                    // Rediriger vers la page d'accueil
+                    window.location.href = '../../../index.html';
+                    return;
+                }
+
+                if (channelId === 'tools') {
+                    // Rediriger vers la page d'outils
+                    window.location.href = '../index.html';
+                    return;
+                }
+
+                // Pour les salons vocaux, vérifier si l'utilisateur a un pseudo
+                if (!this.currentUser) {
+                    alert('Veuillez d\'abord choisir un pseudo');
+                    return;
+                }
+
+                // Salons vocaux
+                if (this.channels[channelId]) {
+                    this.joinChannel(channelId);
+                }
+            }
+
+            joinChannel(channelId) {
+                const channel = this.channels[channelId];
+                
+                // Vérifier si l'utilisateur est déjà dans un salon
+                if (this.currentChannel) {
+                    this.leaveChannel();
+                }
+
+                // Vérifier la capacité du salon
+                if (channel.users.length >= channel.maxUsers) {
+                    alert('Ce salon est complet !');
+                    return;
+                }
+
+                // Ajouter l'utilisateur au salon
+                channel.users.push(this.currentUser);
+                this.currentChannel = channelId;
+
+                // Mettre à jour l'interface
+                document.querySelector(`[data-channel="${channelId}"]`).classList.add('active');
+                document.getElementById('current-channel').textContent = channel.name;
+                document.getElementById('channel-title').textContent = `Salon: ${channel.name}`;
+                
+                this.showChannelView();
+                this.updateChannelCounts();
+                this.updateUsersList();
+            }
+
+            leaveChannel() {
+                if (!this.currentChannel) return;
+
+                const channel = this.channels[this.currentChannel];
+                const userIndex = channel.users.indexOf(this.currentUser);
+                
+                if (userIndex > -1) {
+                    channel.users.splice(userIndex, 1);
+                }
+
+                this.currentChannel = null;
+                this.updateChannelCounts();
+                this.showWelcomeScreen(true);
+                
+                // Retirer toutes les classes active
+                document.querySelectorAll('.channel').forEach(ch => {
+                    ch.classList.remove('active');
+                });
+                
+                document.getElementById('current-channel').textContent = 'Chat Vocal';
+            }
+
+            showChannelView() {
+                document.getElementById('welcome-screen').style.display = 'none';
+                document.getElementById('channel-view').classList.add('active');
+            }
+
+            updateChannelCounts() {
+                Object.keys(this.channels).forEach(channelId => {
+                    const channel = this.channels[channelId];
+                    const countElement = document.querySelector(`[data-channel="${channelId}"]`);
+                    const userCountElement = countElement.querySelector('.user-count');
+                    
+                    if (channel.maxUsers === Infinity) {
+                        userCountElement.textContent = channel.users.length;
+                    } else {
+                        userCountElement.textContent = `${channel.users.length}/${channel.maxUsers}`;
+                    }
+                });
+            }
+
+            updateUsersList() {
+                const container = document.getElementById('users-container');
+                
+                if (!this.currentChannel) {
+                    container.innerHTML = '';
+                    return;
+                }
+
+                const channel = this.channels[this.currentChannel];
+                container.innerHTML = '';
+
+                channel.users.forEach(user => {
+                    const userElement = document.createElement('span');
+                    userElement.className = 'user-item';
+                    userElement.textContent = user;
+                    
+                    if (user === this.currentUser) {
+                        userElement.classList.add('current-user');
+                    }
+                    
+                    container.appendChild(userElement);
+                });
+            }
+
+            toggleToolsMenu() {
+                const menu = document.getElementById('tools-menu');
+                menu.classList.toggle('active');
+            }
+
+            closeToolsMenu() {
+                document.getElementById('tools-menu').classList.remove('active');
+            }
+
+            clearData() {
+                if (confirm('Êtes-vous sûr de vouloir effacer toutes vos données ?')) {
+                    localStorage.clear();
+                    location.reload();
+                }
+            }
+
+            changePseudo() {
+                const newPseudo = prompt('Nouveau pseudo:', this.currentUser);
+                if (newPseudo && newPseudo.trim().length >= 2) {
+                    // Mettre à jour dans le salon actuel
+                    if (this.currentChannel) {
+                        const channel = this.channels[this.currentChannel];
+                        const userIndex = channel.users.indexOf(this.currentUser);
+                        if (userIndex > -1) {
+                            channel.users[userIndex] = newPseudo.trim();
+                        }
+                    }
+                    
+                    this.currentUser = newPseudo.trim();
+                    this.saveData();
+                    this.updateUsersList();
+                }
+            }
+        }
+
+        // Initialiser l'application
+        const app = new ChatApp();
+    </script>
+</body>
+</html>

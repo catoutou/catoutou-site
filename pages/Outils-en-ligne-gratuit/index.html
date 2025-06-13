@@ -80,8 +80,9 @@
         }
 
         .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 2rem;
         }
 
@@ -91,6 +92,8 @@
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s, box-shadow 0.3s;
+            width: 250px;
+            flex-shrink: 0;
         }
 
         .tool-card:hover {
@@ -188,7 +191,12 @@
         /* Responsive */
         @media (max-width: 768px) {
             .tools-grid {
-                grid-template-columns: 1fr;
+                justify-content: center;
+            }
+            
+            .tool-card {
+                width: 100%;
+                max-width: 300px;
             }
         }
     </style>
@@ -217,12 +225,14 @@
             <!-- DÉBUT DES OUTILS - Ajoutez vos nouveaux outils ici -->
 
             <div class="tool-card">
-                <div class="tool-icon">🤖</div>
+                <div class="tool-icon">📢</div>
                 <div class="tool-info">
-                    <h3>AriaChat</h3>
-                    <p>Une AI de chat</p>
-                    <a href="AriaChat/index.html" class="use-btn">Utiliser</a>
+                    <h3>Chat vocal</h3>
+                    <p>Un chat vocal en ligne</p>
+                    <a href="ChatVocal/index.html" class="use-btn">Utiliser</a>
                 </div>
+            </div>
+            
             <div class="tool-card">
                 <div class="tool-icon">🧮</div>
                 <div class="tool-info">
@@ -231,6 +241,7 @@
                     <a href="calculatrice/index.html" class="use-btn">Utiliser</a>
                 </div>
             </div>
+            
             <div class="tool-card">
                 <div class="tool-icon">🔄</div>
                 <div class="tool-info">
