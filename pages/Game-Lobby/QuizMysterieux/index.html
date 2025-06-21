@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Mystérieux</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* MENU PRINCIPAL */
+        .main-menu {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .main-menu h1 {
+            font-size: 32px;
+            margin-bottom: 40px;
+            color: #fff;
+        }
+
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            min-width: 200px;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .start-btn {
+            background: #4CAF50 !important;
+            border-color: #4CAF50 !important;
+        }
+
+        .start-btn:hover {
+            background: #45a049 !important;
+        }
+
+        /* CONTENEUR DE JEU */
+        .game-container {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            min-height: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .question-counter {
+            text-align: right;
+            color: #aaa;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .question {
+            font-size: 22px;
+            margin-bottom: 30px;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        .answers {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .answer-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .answer-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .next-btn {
+            background: #4CAF50;
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: none;
+            margin: 0 auto;
+        }
+
+        .next-btn:hover {
+            background: #45a049;
+        }
+
+        .correct {
+            background: rgba(76, 175, 80, 0.3) !important;
+            border-color: #4CAF50 !important;
+        }
+
+        .incorrect {
+            background: rgba(244, 67, 54, 0.3) !important;
+            border-color: #f44336 !important;
+        }
+
+        .score {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+
+        /* Effets de corruption */
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitch-anim-1 0.2s infinite linear alternate-reverse;
+            color: #ff0000;
+            z-index: -1;
+        }
+
+        .glitch::after {
+            animation: glitch-anim-2 0.2s infinite linear alternate-reverse;
+            color: #00ff00;
+            z-index: -2;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip: rect(42px, 9999px, 44px, 0); }
+            25% { clip: rect(52px, 9999px, 36px, 0); }
+            50% { clip: rect(70px, 9999px, 71px, 0); }
+            75% { clip: rect(30px, 9999px, 40px, 0); }
+            100% { clip: rect(25px, 9999px, 42px, 0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(65px, 9999px, 99px, 0); }
+            25% { clip: rect(52px, 9999px, 74px, 0); }
+            50% { clip: rect(79px, 9999px, 85px, 0); }
+            75% { clip: rect(75px, 9999px, 81px, 0); }
+            100% { clip: rect(67px, 9999px, 90px, 0); }
+        }
+
+        .error-message {
+            position: fixed;
+            background: #ff0000;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            z-index: 1000;
+            animation: fadeInOut 4s ease-in-out forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        .screen-corruption {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 9999;
+            display: none;
+        }
+
+        .final-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            color: white;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            z-index: 10000;
+        }
+
+        .final-message {
+            font-size: 28px;
+            margin-bottom: 20px;
+            animation: fadeIn 2s ease-in;
+        }
+
+        .final-subtitle {
+            font-size: 20px;
+            color: #aaa;
+            animation: fadeIn 3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .restart-btn {
+            background: #4CAF50;
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 30px;
+            animation: fadeIn 4s ease-in;
+        }
+
+        .big-error {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ff0000;
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            z-index: 1001;
+            display: none;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <!-- MENU PRINCIPAL -->
+    <div class="main-menu" id="mainMenu">
+        <h1>Quiz Mystérieux</h1>
+        <div>
+            <button class="menu-btn start-btn" onclick="startGame()">Commencer</button>
+        </div>
+        <div>
+            <!-- MODIFIEZ ICI LES LIENS VERS VOS PAGES -->
+            <button class="menu-btn" onclick="window.location.href='../../../index.html'">Accueil</button>
+            <button class="menu-btn" onclick="window.location.href='../index.html'">Tous les jeux</button>
+        </div>
+    </div>
+
+    <!-- CONTENEUR DE JEU -->
+    <div class="game-container" id="gameContainer">
+        <div class="question-counter" id="counter"></div>
+        <div class="score" id="score">Score: 0/0</div>
+        <div class="question" id="question"></div>
+        <div class="answers" id="answers"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Question suivante</button>
+    </div>
+
+    <div class="big-error" id="bigError">
+        ERREUR CRITIQUE<br>
+        SYSTÈME CORROMPU<br>
+        <div style="font-size: 14px; margin-top: 10px;">Code: 0x666</div>
+    </div>
+
+    <div class="screen-corruption" id="screenCorruption"></div>
+
+    <div class="final-screen" id="finalScreen">
+        <div class="final-message">As-tu vraiment eu peur ?</div>
+        <div class="final-subtitle">Ça faisait partie du jeu.</div>
+        <button class="restart-btn" onclick="backToMenu()">Retour au menu</button>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "En quelle année a été construite la tour Eiffel ?",
+                answers: ["1887", "1889", "1891", "1895"],
+                correct: 1
+            },
+            {
+                question: "Quel est l'élément chimique dont le symbole est 'Au' ?",
+                answers: ["Argent", "Aluminium", "Or", "Arsenic"],
+                correct: 2
+            },
+            {
+                question: "Qui a peint 'La Nuit étoilée' ?",
+                answers: ["Picasso", "Van Gogh", "Monet", "Da Vinci"],
+                correct: 1
+            },
+            {
+                question: "Combien d'os compte le corps humain adulte ?",
+                answers: ["196", "206", "216", "226"],
+                correct: 1
+            },
+            {
+                question: "Quelle est la vitesse de la lumière dans le vide ?",
+                answers: ["299 792 458 m/s", "300 000 000 m/s", "299 800 000 m/s", "298 000 000 m/s"],
+                correct: 0
+            },
+            {
+                question: "En quelle année a eu lieu la chute du mur de Berlin ?",
+                answers: ["1987", "1988", "1989", "1990"],
+                correct: 2
+            },
+            {
+                question: "Quel est le plus petit pays du monde ?",
+                answers: ["Monaco", "Saint-Marin", "Vatican", "Nauru"],
+                correct: 2
+            },
+            {
+                question: "Qu3l 3st l3 p01nt l3 plus h4ut d3 l4 T3rr3 ?",
+                answers: ["K2", "Mont Everest", "Kangchenjunga", "Err3ur d3 m3m01r3"],
+                correct: 1
+            },
+            {
+                question: "C0mb13n d3 ch4mbr3s c0mpt3 l3 cœur hum41n ?",
+                answers: ["2", "4", "6", "1l t3 r3g4rd3"],
+                correct: 1
+            },
+            {
+                question: "Qu3ll3 3st l4 pl4n3t3 l4 plus pr0ch3 du S0l31l ?",
+                answers: ["V3nus", "M3rcur3", "M4rs", "1l 3st d3rr13r3 t01"],
+                correct: 1
+            },
+            {
+                question: "En qu3ll3 4nn33 4 3t3 1nv3nt3 l'1nt3rn3t ?",
+                answers: ["1969", "1983", "1991", "TU N3 D3VR41S P4S 3TR3 1C1"],
+                correct: 0
+            },
+            {
+                question: "Qu3l 3st l3 plus gr4nd oc34n d3 l4 T3rr3 ?",
+                answers: ["4tl4nt1qu3", "P4c1f1qu3", "1nd13n", "1L V13NT POUR T01"],
+                correct: 1
+            },
+            {
+                question: "C0mb13n d3 c0nt1n3nts y 4-t-1l sur T3rr3 ?",
+                answers: ["5", "6", "7", "P3UT-3TR3 QU3 TU D3VR41S 4RR3T3R"],
+                correct: 2
+            },
+            {
+                question: "Qu1 4 3cr1t '1984' ?",
+                answers: ["G30rg3 0rw3ll", "4ldu5 Huxl3y", "R4y Br4dbury", "1L T3 V01T"],
+                correct: 0
+            },
+            {
+                question: "Qu3ll3 3st l4 f0rmul3 ch1m1qu3 d3 l'34u ?",
+                answers: ["H2O", "CO2", "NaCl", "N'3T31NS P4S"],
+                correct: 0
+            },
+            {
+                question: "3n qu3ll3 4nn33 l'h0mm3 4-t-1l m4rch3 sur l4 Lun3 ?",
+                answers: ["1967", "1969", "1971", "J4M41S - C'3T41T F4UX"],
+                correct: 1
+            },
+            {
+                question: "Qu1 4 c0mp053 l4 '9e Symph0n13' ?",
+                answers: ["M0z4rt", "B33th0v3n", "B4ch", "L3S V01X D4NS T4 T3T3"],
+                correct: 1
+            },
+            {
+                question: "Qu3l 3st l3 plus gr4nd d353rt du m0nd3 ?",
+                answers: ["S4h4r4", "G0b1", "4nt4rct1qu3", "T0N 3SPR1T V1D3"],
+                correct: 2
+            },
+            {
+                question: "C0mb13n d3 t3mps m3t l4 T3rr3 p0ur f41r3 un t0ur c0mpl3t ?",
+                answers: ["23h 56m", "24h", "25h 12m", "L3 T3MPS N'3X1ST3 P4S"],
+                correct: 0
+            },
+            {
+                question: "EST-CE QUE TU ENTENDS LES VOIX AUSSI ?",
+                answers: ["Non", "Oui", "Qu'est-ce qui se passe ?", "JE VEUX SORTIR"],
+                correct: 3
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = -1;
+
+        function startGame() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'block';
+            currentQuestion = 0;
+            score = 0;
+            displayQuestion();
+        }
+
+        function backToMenu() {
+            // Réinitialiser tout
+            currentQuestion = 0;
+            score = 0;
+            selectedAnswer = -1;
+            
+            // Nettoyer les effets
+            const questionEl = document.getElementById('question');
+            questionEl.classList.remove('glitch');
+            questionEl.removeAttribute('data-text');
+            
+            // Nettoyer les erreurs
+            const errors = document.querySelectorAll('.error-message');
+            errors.forEach(error => error.remove());
+            
+            // Retour au menu
+            document.getElementById('finalScreen').style.display = 'none';
+            document.getElementById('screenCorruption').style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'none';
+            document.getElementById('mainMenu').style.display = 'block';
+        }
+
+        function displayQuestion() {
+            const questionEl = document.getElementById('question');
+            const answersEl = document.getElementById('answers');
+            const counterEl = document.getElementById('counter');
+            const scoreEl = document.getElementById('score');
+
+            counterEl.textContent = `Question ${currentQuestion + 1}/${questions.length}`;
+            scoreEl.textContent = `Score: ${score}/${currentQuestion}`;
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = q.question;
+
+            // Effets de corruption à partir de la question 7
+            if (currentQuestion >= 6) {
+                questionEl.setAttribute('data-text', q.question);
+                questionEl.classList.add('glitch');
+            }
+
+            answersEl.innerHTML = '';
+            q.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = answer;
+                btn.onclick = () => selectAnswer(index);
+                answersEl.appendChild(btn);
+            });
+
+            document.getElementById('nextBtn').style.display = 'none';
+            selectedAnswer = -1;
+
+            // Déclencher les erreurs selon la question
+            if (currentQuestion === 6) {
+                setTimeout(() => showError("Avertissement: Corruption détectée", Math.random() * window.innerWidth, Math.random() * window.innerHeight), 2000);
+            } else if (currentQuestion === 7) {
+                setTimeout(() => {
+                    showError("ERREUR: Mémoire corrompue", Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+                    showError("Alerte système", Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+                    showError("Processus inattendu détecté", Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+                }, 1500);
+            } else if (currentQuestion === 8) {
+                setTimeout(() => {
+                    showMultipleErrors(8);
+                }, 1000);
+            } else if (currentQuestion === 9) {
+                setTimeout(() => {
+                    document.getElementById('bigError').style.display = 'block';
+                    showMultipleErrors(15);
+                    setTimeout(() => {
+                        document.getElementById('bigError').style.display = 'none';
+                    }, 4000);
+                }, 1500);
+            } else if (currentQuestion >= 10) {
+                setTimeout(() => {
+                    createMassiveErrorStorm();
+                }, 500);
+            }
+        }
+
+        function selectAnswer(index) {
+            if (selectedAnswer !== -1) return;
+
+            selectedAnswer = index;
+            const buttons = document.querySelectorAll('.answer-btn');
+            const correct = questions[currentQuestion].correct;
+
+            buttons[index].classList.add(index === correct ? 'correct' : 'incorrect');
+            if (index !== correct) {
+                buttons[correct].classList.add('correct');
+            }
+
+            if (index === correct) {
+                score++;
+            }
+
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                displayQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function showError(message, x, y) {
+            const error = document.createElement('div');
+            error.className = 'error-message';
+            error.textContent = message;
+            error.style.left = Math.min(x, window.innerWidth - 200) + 'px';
+            error.style.top = Math.min(y, window.innerHeight - 50) + 'px';
+            document.body.appendChild(error);
+
+            setTimeout(() => {
+                if (error.parentNode) {
+                    error.parentNode.removeChild(error);
+                }
+            }, 4000);
+        }
+
+        function showMultipleErrors(count) {
+            const errorMessages = [
+                "ERREUR FATALE",
+                "SYSTÈME CORROMPU", 
+                "ACCÈS REFUSÉ",
+                "MÉMOIRE PLEINE",
+                "VIRUS DÉTECTÉ",
+                "CONNEXION FERMÉE",
+                "DONNÉES PERDUES",
+                "PROCESSEUR SURCHAUFFÉ",
+                "DISQUE DUR DÉFAILLANT",
+                "IL VOUS OBSERVE"
+            ];
+
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const message = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+                    showError(message, x, y);
+                }, i * 300);
+            }
+        }
+
+        function createMassiveErrorStorm() {
+            const errorMessages = [
+                "ERREUR FATALE",
+                "SYSTÈME CORROMPU",
+                "ACCÈS REFUSÉ", 
+                "MÉMOIRE PLEINE",
+                "VIRUS DÉTECTÉ",
+                "ÉCRAN BLEU IMMINENT",
+                "DONNÉES PERDUES",
+                "CONNEXION FERMÉE",
+                "IL EST DERRIÈRE TOI",
+                "N'ÉTEINS PAS L'ÉCRAN",
+                "TU N'AURAIS PAS DÛ JOUER",
+                "SYSTEM32 SUPPRIMÉ",
+                "BOOT FAILURE",
+                "REGISTRY ERROR",
+                "KERNEL PANIC",
+                "STACK OVERFLOW",
+                "BUFFER OVERFLOW",
+                "SEGMENTATION FAULT",
+                "ACCESS VIOLATION",
+                "TU NE PEUX PLUS PARTIR",
+                "NOUS SAVONS OÙ TU VIS",
+                "FERME LES YEUX",
+                "IL ARRIVE",
+                "C'EST TROP TARD",
+                "EXCEPTION 0x00000001",
+                "CRITICAL PROCESS DIED",
+                "HARDWARE MALFUNCTION",
+                "BIOS CORRUPTION",
+                "FIRMWARE ERROR",
+                "NETWORK INTRUSION"
+            ];
+
+            let errorCount = 0;
+            const maxErrors = 200; // BEAUCOUP plus d'erreurs !
+
+            const errorInterval = setInterval(() => {
+                if (errorCount >= maxErrors) {
+                    clearInterval(errorInterval);
+                    setTimeout(() => {
+                        document.getElementById('screenCorruption').style.display = 'block';
+                        setTimeout(() => {
+                            document.getElementById('finalScreen').style.display = 'flex';
+                        }, 3000);
+                    }, 2000);
+                    return;
+                }
+
+                // Générer 5-8 erreurs à la fois pour l'effet de storm
+                const burstCount = Math.floor(Math.random() * 4) + 5;
+                for (let i = 0; i < burstCount; i++) {
+                    const message = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+                    showError(message, x, y);
+                    errorCount++;
+                }
+            }, 100); // Plus rapide pour plus d'intensité
+        }
+
+        function endGame() {
+            createMassiveErrorStorm();
+        }
+    </script>
+</body>
+</html>
