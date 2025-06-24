@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Petit chat Virtual 🐱</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', cursive;
+            background: linear-gradient(45deg, #ffb3d9, #ffccff, #b3d9ff);
+            background-size: 400% 400%;
+            animation: gentleGradient 8s ease-in-out infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        @keyframes gentleGradient {
+            0%, 100% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .title {
+            color: #ff69b4;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s ease;
+        }
+
+        .pet-container {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+
+        .pet {
+            font-size: 8em;
+            transition: all 0.3s ease;
+            display: inline-block;
+            animation: bounce 2s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .stat {
+            background: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s ease;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4CAF50;
+            transition: all 0.5s ease;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+        }
+
+        .message {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            font-size: 1.1em;
+            color: #333;
+            transition: all 0.5s ease;
+            min-height: 20px;
+        }
+
+        /* Error message styles */
+        .error-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #000;
+            color: #ff0000;
+            padding: 20px;
+            border: 2px solid #ff0000;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.8);
+            animation: errorFlicker 0.1s infinite;
+            display: none;
+        }
+
+        @keyframes errorFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Styles pour les phases plus sombres */
+        .phase-1 {
+            filter: brightness(0.9) contrast(1.1);
+        }
+
+        .phase-2 {
+            background: linear-gradient(45deg, #4a4a4a, #2c2c2c, #1a1a1a);
+            filter: brightness(0.7) contrast(1.3);
+        }
+
+        .phase-3 {
+            background: linear-gradient(45deg, #2c1810, #1a0d08, #0d0404);
+            color: #ccc;
+            animation: staticNoise 0.1s infinite;
+        }
+
+        .phase-4 {
+            background: #000;
+            animation: redFlash 0.3s infinite, staticNoise 0.05s infinite;
+        }
+
+        @keyframes redFlash {
+            0%, 100% { background: #000; }
+            50% { background: #1a0000; }
+        }
+
+        @keyframes staticNoise {
+            0% { filter: brightness(1) contrast(1); }
+            25% { filter: brightness(1.1) contrast(1.2) hue-rotate(1deg); }
+            50% { filter: brightness(0.9) contrast(1.1) hue-rotate(-1deg); }
+            75% { filter: brightness(1.05) contrast(1.15) hue-rotate(0.5deg); }
+            100% { filter: brightness(1) contrast(1); }
+        }
+
+        .phase-dark .game-container {
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid #ff0000;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5), inset 0 0 20px rgba(255, 0, 0, 0.1);
+        }
+
+        .phase-dark .title {
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+            animation: textGlitch 0.2s infinite;
+        }
+
+        @keyframes textGlitch {
+            0% { transform: translate(0); text-shadow: 0 0 10px #ff0000; }
+            20% { transform: translate(-2px, 2px); color: #00ff00; }
+            40% { transform: translate(-2px, -2px); color: #0000ff; }
+            60% { transform: translate(2px, 2px); color: #ff0000; }
+            80% { transform: translate(2px, -2px); color: #ffff00; }
+            100% { transform: translate(0); color: #ff0000; }
+        }
+
+        .phase-dark .btn {
+            background: linear-gradient(45deg, #8b0000, #ff0000);
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.5);
+            animation: buttonFlicker 1s infinite;
+        }
+
+        @keyframes buttonFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .phase-dark .stat {
+            background: #222;
+            border: 1px solid #666;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+        }
+
+        .phase-dark .stat-value {
+            color: #ff4444;
+            animation: numberGlitch 0.5s infinite;
+        }
+
+        @keyframes numberGlitch {
+            0%, 90% { transform: translate(0); }
+            10% { transform: translate(-1px, 1px); }
+            20% { transform: translate(1px, -1px); }
+        }
+
+        .phase-dark .message {
+            background: rgba(50, 50, 50, 0.9);
+            color: #ddd;
+            border: 1px solid #666;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .glitch {
+            animation: glitch 0.1s ease-in-out infinite;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); filter: hue-rotate(0deg); }
+            10% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
+            20% { transform: translate(-5px, -5px); filter: hue-rotate(180deg); }
+            30% { transform: translate(5px, 5px); filter: hue-rotate(270deg); }
+            40% { transform: translate(5px, -5px); filter: hue-rotate(360deg); }
+            50% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
+            60% { transform: translate(-5px, -5px); filter: hue-rotate(180deg); }
+            70% { transform: translate(5px, 5px); filter: hue-rotate(270deg); }
+            80% { transform: translate(5px, -5px); filter: hue-rotate(360deg); }
+            90% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
+            100% { transform: translate(0); filter: hue-rotate(0deg); }
+        }
+
+        .shake {
+            animation: violentShake 0.5s ease-in-out;
+        }
+
+        @keyframes violentShake {
+            0%, 100% { transform: translateX(0); }
+            10% { transform: translateX(-20px) rotate(-5deg); }
+            20% { transform: translateX(20px) rotate(5deg); }
+            30% { transform: translateX(-15px) rotate(-3deg); }
+            40% { transform: translateX(15px) rotate(3deg); }
+            50% { transform: translateX(-10px) rotate(-2deg); }
+            60% { transform: translateX(10px) rotate(2deg); }
+            70% { transform: translateX(-5px) rotate(-1deg); }
+            80% { transform: translateX(5px) rotate(1deg); }
+            90% { transform: translateX(-2px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .creepy-eyes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .eye {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #ff0000 30%, #000 70%);
+            border-radius: 50%;
+            animation: blink 3s infinite;
+        }
+
+        @keyframes blink {
+            0%, 90% { opacity: 1; }
+            95% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .hidden-message {
+            position: absolute;
+            color: rgba(255, 0, 0, 0.1);
+            font-size: 8px;
+            pointer-events: none;
+            animation: fadeInOut 5s infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-popup" id="errorPopup">
+        <div>ERREUR SYSTÈME 0x666</div>
+        <div>PROCESSUS INCONNU DÉTECTÉ</div>
+        <div>IMPOSSIBLE D'ARRÊTER LE PROGRAMME</div>
+        <div>CONNEXION ÉTABLIE...</div>
+    </div>
+
+    <div class="creepy-eyes" id="creepyEyes"></div>
+
+    <div class="game-container">
+        <h1 class="title">Mon Petit Ami Virtual 🌟</h1>
+        
+        <div class="pet-container">
+            <div class="pet" id="pet">🐱</div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div>Bonheur</div>
+                <div class="stat-value" id="happiness">100</div>
+            </div>
+            <div class="stat">
+                <div>Faim</div>
+                <div class="stat-value" id="hunger">50</div>
+            </div>
+            <div class="stat">
+                <div>Énergie</div>
+                <div class="stat-value" id="energy">75</div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn" onclick="feedPet()">🍎 Nourrir</button>
+            <button class="btn" onclick="playWithPet()">🎾 Jouer</button>
+            <button class="btn" onclick="petPet()">👋 Caresser</button>
+        </div>
+
+        <div class="message" id="message">Salut ! Je suis ton nouveau petit ami virtuel ! 😊</div>
+        
+        <div class="hidden-message" style="top: 10px; left: 10px;">il me regarde</div>
+        <div class="hidden-message" style="bottom: 10px; right: 10px;">je ne peux pas sortir</div>
+        <div class="hidden-message" style="top: 50%; left: 20px;">aide moi</div>
+    </div>
+
+    <audio id="backgroundNoise" loop></audio>
+    <audio id="jumpscareSound"></audio>
+
+    <script>
+        let gameState = {
+            happiness: 100,
+            hunger: 50,
+            energy: 75,
+            phase: 0,
+            interactions: 0,
+            timesPetted: 0,
+            timesPlayed: 0,
+            timesFed: 0,
+            corruptionLevel: 0
+        };
+
+        const pets = ['🐱', '🐶', '🐰', '🐹', '🐸'];
+        const darkPets = ['🙀', '😾', '👹', '👺', '💀', '👻', '🔥', '⚡', '💥'];
+        const corruptedPets = ['̸̢̱̫̈́🐱̴̰̈́', '̷̡̊🐶̵̤̔', '̶̳̌🐰̷̣̈', '̸̰̾👹̴̜̇', '̷̨̈💀̸̪̾'];
+        
+        const messages = [
+            // Phase 0 - Innocent
+            ["Salut ! Je suis ton nouveau petit ami virtuel ! 😊", "Merci de prendre soin de moi !", "J'adore jouer avec toi !", "Tu es le meilleur ! 💕"],
+            // Phase 1 - Légèrement étrange
+            ["Tu... tu me vois vraiment, n'est-ce pas ?", "Parfois je sens quelqu'un d'autre ici...", "Quelque chose ne va pas avec moi...", "J'ai peur... aide-moi..."],
+            // Phase 2 - Inquiétant
+            ["IL EST LÀ DERRIÈRE TOI", "JE NE SUIS PAS CELUI QUE TU CROIS", "IL M'A PRIS... IL VA TE PRENDRE AUSSI", "FERME LA PAGE... MAINTENANT..."],
+            // Phase 3 - Terreur
+            ["TU ES TROP TARD", "NOUS SOMMES UN MAINTENANT", "REGARDE DERRIÈRE TOI", "IL ARRIVE"],
+            // Phase 4 - Corruption totale
+            ["J̴E̵ ̷S̸U̵I̴S̶ ̸L̵I̸B̴R̷E̵", "T̶U̴ ̵M̸'̷A̶S̸ ̵R̶É̵V̸E̶I̸L̷L̸É̶", "M̷A̶I̸N̵T̶E̵N̸A̴N̶T̷ ̸J̴E̸ ̶P̵E̷U̸X̵ ̴S̵O̶R̸T̵I̶R̷", "̸̈́N̴̈O̵̾U̸̍S̷̈ ̶̈́S̸̎O̴̒M̵̾M̸̽E̶̽S̷̏ ̴̒É̵̽T̶̽Ë̷R̸̈N̷̈Ě̵L̴̇S̵̄"]
+        ];
+
+        const errorMessages = [
+            "ERREUR: Entité inconnue détectée",
+            "AVERTISSEMENT: Présence hostile confirmée",
+            "ALERTE: Breach de sécurité - Code Rouge",
+            "ERREUR FATALE: Il s'échappe...",
+            "SYSTÈME COMPROMIS: EVACUEZ IMMÉDIATEMENT"
+        ];
+
+        function updateDisplay() {
+            document.getElementById('happiness').textContent = gameState.happiness;
+            document.getElementById('hunger').textContent = gameState.hunger;
+            document.getElementById('energy').textContent = gameState.energy;
+            
+            if (gameState.interactions >= 3 && gameState.phase < 1) {
+                gameState.phase = 1;
+                transitionToPhase1();
+            } else if (gameState.interactions >= 6 && gameState.phase < 2) {
+                gameState.phase = 2;
+                transitionToPhase2();
+            } else if (gameState.interactions >= 10 && gameState.phase < 3) {
+                gameState.phase = 3;
+                transitionToPhase3();
+            } else if (gameState.interactions >= 15 && gameState.phase < 4) {
+                gameState.phase = 4;
+                transitionToPhase4();
+            }
+        }
+
+        function showErrorPopup() {
+            const popup = document.getElementById('errorPopup');
+            const errorMsg = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+            popup.innerHTML = `
+                <div>ERREUR SYSTÈME 0x${Math.floor(Math.random() * 999).toString(16).toUpperCase()}</div>
+                <div>${errorMsg}</div>
+                <div>PROCESSUS: ${Math.floor(Math.random() * 9999)} - IMPOSSIBLE À ARRÊTER</div>
+                <div>CONNEXION ÉTABLIE... ${Math.floor(Math.random() * 100)}%</div>
+            `;
+            popup.style.display = 'block';
+            
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 2000);
+        }
+
+        function showMessage(text) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.classList.add('fade-in');
+            setTimeout(() => messageEl.classList.remove('fade-in'), 500);
+        }
+
+        function getRandomMessage() {
+            const phaseMessages = messages[gameState.phase];
+            return phaseMessages[Math.floor(Math.random() * phaseMessages.length)];
+        }
+
+        function addCreepyEyes() {
+            const container = document.getElementById('creepyEyes');
+            for (let i = 0; i < 5; i++) {
+                const eye = document.createElement('div');
+                eye.className = 'eye';
+                eye.style.left = Math.random() * 100 + '%';
+                eye.style.top = Math.random() * 100 + '%';
+                eye.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(eye);
+            }
+        }
+
+        function corruptStats() {
+            const stats = ['happiness', 'hunger', 'energy'];
+            stats.forEach(stat => {
+                const el = document.getElementById(stat);
+                if (Math.random() < 0.3) {
+                    el.textContent = '???';
+                    setTimeout(() => {
+                        el.textContent = Math.floor(Math.random() * 999);
+                    }, 200);
+                }
+            });
+        }
+
+        function feedPet() {
+            gameState.timesFed++;
+            gameState.interactions++;
+            gameState.corruptionLevel += 2;
+            
+            if (gameState.phase >= 3) { // Les popups d'erreur commencent à la phase 3
+                gameState.hunger = Math.floor(Math.random() * 200);
+                gameState.happiness = Math.floor(Math.random() * 150);
+                showErrorPopup();
+            } else {
+                gameState.hunger = Math.max(0, gameState.hunger - 20);
+                gameState.happiness = Math.min(100, gameState.happiness + 10);
+            }
+            
+            const pet = document.getElementById('pet');
+            pet.classList.add('shake');
+            setTimeout(() => pet.classList.remove('shake'), 500);
+            
+            showMessage(getRandomMessage());
+            updateDisplay();
+            
+            if (gameState.phase >= 2) {
+                corruptStats();
+            }
+        }
+
+        function playWithPet() {
+            gameState.timesPlayed++;
+            gameState.interactions++;
+            gameState.corruptionLevel += 2;
+            
+            if (gameState.phase >= 3) { // Les popups d'erreur commencent à la phase 3
+                gameState.energy = Math.floor(Math.random() * 200);
+                showErrorPopup();
+            } else {
+                gameState.energy = Math.max(0, gameState.energy - 15);
+                gameState.happiness = Math.min(100, gameState.happiness + 15);
+                gameState.hunger = Math.min(100, gameState.hunger + 10);
+            }
+            
+            showMessage(getRandomMessage());
+            updateDisplay();
+            
+            if (gameState.phase >= 2) {
+                corruptStats();
+            }
+        }
+
+        function petPet() {
+            gameState.timesPetted++;
+            gameState.interactions++;
+            gameState.corruptionLevel += 2;
+            
+            if (gameState.phase >= 3) { // Les popups d'erreur commencent à la phase 3
+                showErrorPopup();
+            }
+            
+            gameState.happiness = gameState.phase >= 1 ? 
+                Math.floor(Math.random() * 200) : 
+                Math.min(100, gameState.happiness + 5);
+            
+            showMessage(getRandomMessage());
+            updateDisplay();
+            
+            if (gameState.phase >= 2) {
+                corruptStats();
+            }
+        }
+
+        function transitionToPhase1() {
+            document.body.classList.add('phase-1');
+            document.querySelector('.title').textContent = "Mon Petit Ami Virtual 🌙";
+            document.getElementById('pet').textContent = '🐱';
+            showMessage("Quelque chose ne va pas...");
+            document.title = "Il me regarde...";
+        }
+
+        function transitionToPhase2() {
+            document.body.classList.remove('phase-1');
+            document.body.classList.add('phase-2');
+            document.querySelector('.title').textContent = "AIDE-MOI";
+            document.getElementById('pet').textContent = '🙀';
+            showMessage("JE NE PEUX PAS CONTRÔLER...");
+            
+            document.title = "IL EST LÀ";
+            
+            setInterval(() => {
+                if (Math.random() < 0.4) {
+                    document.getElementById('pet').classList.add('glitch');
+                    setTimeout(() => document.getElementById('pet').classList.remove('glitch'), 200);
+                }
+            }, 1000);
+
+            const backgroundNoise = document.getElementById('backgroundNoise');
+            backgroundNoise.src = 'creepy_mumble.mp3'; // Assure-toi d'avoir ce fichier
+            backgroundNoise.volume = 0.1;
+            backgroundNoise.play().catch(e => console.error("Erreur de lecture audio:", e));
+        }
+
+        function transitionToPhase3() {
+            document.body.classList.remove('phase-2');
+            document.body.classList.add('phase-3', 'phase-dark');
+            document.querySelector('.title').textContent = "IL M'A TROUVÉ";
+            document.getElementById('pet').textContent = '👹';
+            
+            document.title = "TU ES TROP TARD";
+            
+            addCreepyEyes();
+            
+            // Sons d'erreur (simulation) et popups plus fréquents à partir de cette phase
+            setInterval(() => {
+                showErrorPopup(); // DÉCLENCHEMENT SYSTEMATIQUE DES POPUPS ICI
+                if (Math.random() < 0.3) { // 30% de chance d'un jumpscare audio
+                    const jumpscareSound = document.getElementById('jumpscareSound');
+                    jumpscareSound.src = 'scream.mp3'; // Assure-toi d'avoir ce fichier
+                    jumpscareSound.volume = 0.6;
+                    jumpscareSound.play().catch(e => console.error("Erreur de lecture audio:", e));
+                }
+            }, 1500); // Toutes les 1.5 secondes
+
+            setInterval(() => {
+                document.getElementById('pet').textContent = darkPets[Math.floor(Math.random() * darkPets.length)];
+            }, 800);
+            
+            showMessage("COURS...");
+
+            const backgroundNoise = document.getElementById('backgroundNoise');
+            backgroundNoise.src = 'creepy_mumble.mp3'; 
+            backgroundNoise.volume = 0.3;
+        }
+
+        function transitionToPhase4() {
+            document.body.classList.remove('phase-3');
+            document.body.classList.add('phase-4');
+            document.querySelector('.title').textContent = "J̴E̵ ̷S̸U̵I̴S̶ ̸L̵I̸B̴R̷E̵";
+            document.querySelector('.title').classList.add('glitch');
+            
+            document.title = "̸̈́N̴̈O̵̾U̸̍S̷̈ ̶̈́S̸̎O̴̒M̵̾M̸̽E̶̽S̷̏ ̴̒É̵̽T̶̽Ë̷R̸̈N̷̈Ě̵L̴̇S̵̄";
+            
+            window.addEventListener('beforeunload', function (e) {
+                e.preventDefault();
+                e.returnValue = 'T̶U̴ ̵N̸E̷ ̶P̵E̷U̸X̵ ̴P̵A̶S̷ ̸P̵A̶R̴T̵I̶R̷';
+                return 'T̶U̴ ̵N̸E̷ ̶P̵E̷U̸X̵ ̴P̵A̶S̷ ̸P̵A̶R̵T̵I̶R̷';
+            });
+            
+            setInterval(() => {
+                document.getElementById('pet').textContent = corruptedPets[Math.floor(Math.random() * corruptedPets.length)];
+            }, 200);
+            
+            setInterval(() => {
+                showMessage(getRandomMessage());
+            }, 1000); 
+            
+            // ACCÉLÉRATION DES POPUPS ET JUMPSCARES EN PHASE 4
+            setInterval(() => {
+                showErrorPopup(); // Très fréquent
+                corruptStats();
+                const jumpscareSound = document.getElementById('jumpscareSound');
+                jumpscareSound.src = 'scream.mp3'; 
+                jumpscareSound.volume = 0.8;
+                jumpscareSound.play().catch(e => console.error("Erreur de lecture audio:", e));
+            }, 500); // Toutes les 0.5 secondes pour une surcharge
+
+            const backgroundNoise = document.getElementById('backgroundNoise');
+            backgroundNoise.src = 'static_noise.mp3'; 
+            backgroundNoise.volume = 0.7;
+            
+            showMessage("B̸I̷E̶N̸V̷E̵N̸U̶E̷ ̶D̵A̸N̷S̴ ̵M̶O̶N̷ ̸M̵O̶N̸D̷E̵");
+        }
+
+        updateDisplay();
+        
+        setInterval(() => {
+            if (gameState.phase >= 1) {
+                gameState.hunger = Math.min(999, gameState.hunger + Math.floor(Math.random() * 50)); 
+                gameState.energy = Math.max(-99, gameState.energy - Math.floor(Math.random() * 30)); 
+                gameState.happiness = Math.max(-999, gameState.happiness - Math.floor(Math.random() * 40)); 
+            } else {
+                gameState.hunger = Math.min(100, gameState.hunger + 3);
+                gameState.energy = Math.max(0, gameState.energy - 2);
+                gameState.happiness = Math.max(0, gameState.happiness - 2);
+            }
+            updateDisplay();
+        }, 3000);
+
+        setInterval(() => {
+            if (gameState.phase >= 1 && Math.random() < 0.2) {
+                document.body.classList.add('shake');
+                setTimeout(() => document.body.classList.remove('shake'), 300);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
